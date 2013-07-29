@@ -2963,6 +2963,8 @@ void CUser::OperatorCommand(Packet & pkt)
 		pUser->m_bAuthority = AUTHORITY_ATTACK_DISABLED;
 		break;
 	case OPERATOR_ENABLE_ATTACK:
+		pUser->m_bAuthority = AUTHORITY_PLAYER;
+		break;
 	case OPERATOR_UNMUTE:
 		pUser->m_bAuthority = AUTHORITY_PLAYER;
 		break;

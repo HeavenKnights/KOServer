@@ -31,6 +31,7 @@ void CEbenezerDlg::InitServerCommands()
 		{ "permanent",			&CEbenezerDlg::HandlePermanentChatCommand,		"Sets the permanent chat bar to the specified text." },
 		{ "offpermanent",		&CEbenezerDlg::HandlePermanentChatOffCommand,	"Resets the permanent chat bar text." },
 		{ "reload_notice",		&CEbenezerDlg::HandleReloadNoticeCommand,		"Reloads the in-game notice list." },
+		{ "reload_tables",		&CEbenezerDlg::HandleReloadTablesCommand,	"Reloads the in-game tables." },
 	};
 
 	init_command_table(CEbenezerDlg, commandTable, s_commandTable);
@@ -735,6 +736,37 @@ COMMAND_HANDLER(CEbenezerDlg::HandleReloadNoticeCommand)
 	}
 	g_pMain->m_socketMgr.ReleaseLock();
 #endif
+	return true;
+}
+
+COMMAND_HANDLER(CEbenezerDlg::HandleReloadTablesCommand)
+{
+	printf("Reloads the in-game tables.\n");
+	m_MagictableArray.DeleteAllData();
+	m_Magictype1Array.DeleteAllData();
+	m_Magictype2Array.DeleteAllData();
+	m_Magictype3Array.DeleteAllData();
+	m_Magictype4Array.DeleteAllData();
+	m_Magictype5Array.DeleteAllData();
+	m_Magictype6Array.DeleteAllData();
+	m_Magictype8Array.DeleteAllData();
+	m_Magictype9Array.DeleteAllData();
+	LoadMagicTable();
+	LoadMagicType1();
+	LoadMagicType2();
+	LoadMagicType3();
+	LoadMagicType4();
+	LoadMagicType5();
+	LoadMagicType6();
+	LoadMagicType7();
+	LoadMagicType8();
+	LoadMagicType9();
+	m_UserPersonalRankMap.clear();
+	m_UserKnightsRankMap.clear();
+	LoadUserRankings();
+	
+
+
 	return true;
 }
 

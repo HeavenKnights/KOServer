@@ -391,6 +391,7 @@ public:
 	COMMAND_HANDLER(HandlePermanentChatCommand);
 	COMMAND_HANDLER(HandlePermanentChatOffCommand);
 	COMMAND_HANDLER(HandleReloadNoticeCommand);
+	COMMAND_HANDLER(HandleReloadTablesCommand);
 };
 
 extern CEbenezerDlg * g_pMain;

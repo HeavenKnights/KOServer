@@ -73,9 +73,9 @@ void Unit::Initialize()
 }
 
 /* 
-	NOTE: Due to KO messiness, we can really only calculate a 2D distance/
-	There are a lot of instances where the y (height level, in this case) coord isn't set,
-	which understandably screws things up a lot.
+NOTE: Due to KO messiness, we can really only calculate a 2D distance/
+There are a lot of instances where the y (height level, in this case) coord isn't set,
+which understandably screws things up a lot.
 */
 // Calculate the distance between 2 2D points.
 float Unit::GetDistance(float fx, float fz)
@@ -194,23 +194,23 @@ void Unit::InsertRegion(int16 insert_x, int16 insert_z)
 /* These should not be declared here, but it's necessary until the AI server better shares unit code */
 
 /**
- * @brief	Calculates damage for players attacking either monsters/NPCs or other players.
- *
- * @param	pTarget			Target unit.
- * @param	pSkill			The skill used in the attack, if applicable..
- * @param	bPreviewOnly	true to preview the damage only and not apply any item bonuses.
- * 							Used by AI logic to determine who to target (by checking who deals the most damage).
- *
- * @return	The damage.
- */
+* @brief	Calculates damage for players attacking either monsters/NPCs or other players.
+*
+* @param	pTarget			Target unit.
+* @param	pSkill			The skill used in the attack, if applicable..
+* @param	bPreviewOnly	true to preview the damage only and not apply any item bonuses.
+* 							Used by AI logic to determine who to target (by checking who deals the most damage).
+*
+* @return	The damage.
+*/
 short CUser::GetDamage(Unit *pTarget, _MAGIC_TABLE *pSkill /*= nullptr*/, bool bPreviewOnly /*= false*/)
 {
 	/*
-		This seems identical to users attacking NPCs/monsters.
-		The only differences are:
-		 - GetACDamage() is not called
-		 - the resulting damage is not divided by 3.
-	 */
+	This seems identical to users attacking NPCs/monsters.
+	The only differences are:
+	- GetACDamage() is not called
+	- the resulting damage is not divided by 3.
+	*/
 	int32 damage = 0;
 	int random = 0;
 	int32 temp_hit = 0, temp_ac = 0, temp_ap = 0, temp_hit_B = 0;
@@ -242,7 +242,7 @@ short CUser::GetDamage(Unit *pTarget, _MAGIC_TABLE *pSkill /*= nullptr*/, bool b
 	if (pTarget->isPlayer())
 	{
 		CUser * pTUser = TO_USER(pTarget);	// NOTE: using a = a*v instead of a *= v because the compiler assumes different 
-											// types being multiplied, which results in these calcs not behaving correctly.
+		// types being multiplied, which results in these calcs not behaving correctly.
 
 		// adjust player AP by percent, for skills like "Critical Point"
 		temp_ap = temp_ap * m_bPlayerAttackAmount / 100; 
@@ -290,7 +290,7 @@ short CUser::GetDamage(Unit *pTarget, _MAGIC_TABLE *pSkill /*= nullptr*/, bool b
 			_MAGIC_TYPE2 *pType2 = g_pMain->m_Magictype2Array.GetData(pSkill->iNum);
 			if (pType2 == nullptr)
 				return -1; 
-			
+
 			// Non-relative/Penetration hit.
 			if (pType2->bHitType == 1 || pType2->bHitType == 2)
 			{
@@ -314,29 +314,29 @@ short CUser::GetDamage(Unit *pTarget, _MAGIC_TABLE *pSkill /*= nullptr*/, bool b
 		temp_hit = temp_ap / 100;
 		result = GetHitRate(m_fTotalHitrate / pTarget->m_fTotalEvasionrate);
 	}
-	
+
 	switch (result)
 	{						// 1. Magical item damage....
-		case GREAT_SUCCESS:
-		case SUCCESS:
-		case NORMAL:
-			if (pSkill != nullptr)
-			{	 // Skill Hit.
-				damage = temp_hit;
-				random = myrand(0, damage);
-				if (pSkill->bType[0] == 1)
-					damage = (short)((temp_hit + 0.3f * random) + 0.99f);
-				else
-					damage = (short)(((temp_hit * 0.6f) + 1.0f * random) + 0.99f);
-			}
+	case GREAT_SUCCESS:
+	case SUCCESS:
+	case NORMAL:
+		if (pSkill != nullptr)
+		{	 // Skill Hit.
+			damage = temp_hit;
+			random = myrand(0, damage);
+			if (pSkill->bType[0] == 1)
+				damage = (short)((temp_hit + 0.3f * random) + 0.99f);
 			else
-			{	// Normal Hit.	
-				damage = temp_hit_B;
-				random = myrand(0, damage);
-				damage = (short)((0.85f * temp_hit_B) + 0.3f * random);
-			}		
-			
-			break;
+				damage = (short)(((temp_hit * 0.6f) + 1.0f * random) + 0.99f);
+		}
+		else
+		{	// Normal Hit.	
+			damage = temp_hit_B;
+			random = myrand(0, damage);
+			damage = (short)((0.85f * temp_hit_B) + 0.3f * random);
+		}		
+
+		break;
 	}	
 
 	// Apply item bonuses
@@ -393,14 +393,14 @@ void CUser::OnDefend(Unit * pAttacker, AttackType attackType)
 }
 
 /**
- * @brief	Trigger item procs.
- *
- * @param	bSlot	   	Slot of item to attempt to proc.
- * @param	pTarget	   	Target of the skill (attacker/defender depending on the proc type).
- * @param	triggerType	Which type of item to proc (offensive/defensive).
- *
- * @return	true if there's an applicable item to proc, false if not.
- */
+* @brief	Trigger item procs.
+*
+* @param	bSlot	   	Slot of item to attempt to proc.
+* @param	pTarget	   	Target of the skill (attacker/defender depending on the proc type).
+* @param	triggerType	Which type of item to proc (offensive/defensive).
+*
+* @return	true if there's an applicable item to proc, false if not.
+*/
 bool CUser::TriggerProcItem(uint8 bSlot, Unit * pTarget, ItemTriggerType triggerType)
 {
 	// Don't proc weapon skills if our weapon is disabled.
@@ -411,8 +411,8 @@ bool CUser::TriggerProcItem(uint8 bSlot, Unit * pTarget, ItemTriggerType trigger
 	_ITEM_DATA * pItem = GetItem(bSlot);
 	if (pItem == nullptr
 		// and that it doesn't need to be repaired.
-		|| pItem->sDuration == 0)
-		return false; // not an applicable item
+			|| pItem->sDuration == 0)
+			return false; // not an applicable item
 
 	// Ensure that this item has an attached proc skill in the table
 	_ITEM_OP * pData = g_pMain->m_ItemOpArray.GetData(pItem->nNum);
@@ -450,14 +450,14 @@ short CNpc::GetDamage(Unit *pTarget, _MAGIC_TABLE *pSkill /*= nullptr*/, bool bP
 }
 
 /**
- * @brief	Calculates damage for monsters/NPCs attacking players.
- *
- * @param	pTarget			Target player.
- * @param	pSkill			The skill (not used here).
- * @param	bPreviewOnly	true to preview the damage only and not apply any item bonuses (not used here).
- *
- * @return	The damage.
- */
+* @brief	Calculates damage for monsters/NPCs attacking players.
+*
+* @param	pTarget			Target player.
+* @param	pSkill			The skill (not used here).
+* @param	bPreviewOnly	true to preview the damage only and not apply any item bonuses (not used here).
+*
+* @return	The damage.
+*/
 short CNpc::GetDamage(CUser *pTarget, _MAGIC_TABLE *pSkill /*= nullptr*/, bool bPreviewOnly /*= false*/) 
 {
 	if (pTarget == nullptr)
@@ -507,14 +507,14 @@ short CNpc::GetDamage(CUser *pTarget, _MAGIC_TABLE *pSkill /*= nullptr*/, bool b
 }
 
 /**
- * @brief	Calculates damage for monsters/NPCs attacking other monsters/NPCs.
- *
- * @param	pTarget			Target NPC/monster.
- * @param	pSkill			The skill (not used here).
- * @param	bPreviewOnly	true to preview the damage only and not apply any item bonuses (not used here).
- *
- * @return	The damage.
- */
+* @brief	Calculates damage for monsters/NPCs attacking other monsters/NPCs.
+*
+* @param	pTarget			Target NPC/monster.
+* @param	pSkill			The skill (not used here).
+* @param	bPreviewOnly	true to preview the damage only and not apply any item bonuses (not used here).
+*
+* @return	The damage.
+*/
 short CNpc::GetDamage(CNpc *pTarget, _MAGIC_TABLE *pSkill /*= nullptr*/, bool bPreviewOnly /*= false*/) 
 {
 	if (pTarget == nullptr)
@@ -550,7 +550,7 @@ short CNpc::GetDamage(CNpc *pTarget, _MAGIC_TABLE *pSkill /*= nullptr*/, bool bP
 		}
 		break;
 	}
-	
+
 	// Enforce damage cap
 	if (damage > MAX_DAMAGE)
 		damage = MAX_DAMAGE;
@@ -754,7 +754,7 @@ uint8 Unit::GetHitRate(float rate)
 		else if (random >= 1001 && random <= 5000)
 			return NORMAL;
 	}
-	
+
 	return FAIL;
 }
 
@@ -794,16 +794,16 @@ void Unit::InitType4(bool bRemoveSavedMagic /*= false*/)
 }
 
 /**
- * @brief	Determine if this unit is basically able to attack the specified unit.
- * 			This should only be called to handle the minimal shared logic between
- * 			NPCs and players. 
- * 			
- * 			You should use the more appropriate CUser or CNpc specialization.
- *
- * @param	pTarget	Target for the attack.
- *
- * @return	true if we can attack, false if not.
- */
+* @brief	Determine if this unit is basically able to attack the specified unit.
+* 			This should only be called to handle the minimal shared logic between
+* 			NPCs and players. 
+* 			
+* 			You should use the more appropriate CUser or CNpc specialization.
+*
+* @param	pTarget	Target for the attack.
+*
+* @return	true if we can attack, false if not.
+*/
 bool Unit::CanAttack(Unit * pTarget)
 {
 	if (pTarget == nullptr)
@@ -817,10 +817,10 @@ bool Unit::CanAttack(Unit * pTarget)
 	// (should include debuffs & being blinded)
 	if (isIncapacitated()
 		// or if our target is in a state in which
-		// they should not be allowed to be attacked
-		|| pTarget->isDead()
-		|| pTarget->isBlinking())
-		return false;
+			// they should not be allowed to be attacked
+				|| pTarget->isDead()
+				|| pTarget->isBlinking())
+				return false;
 
 	// Finally, we can only attack the target if we are hostile towards them.
 	return isHostileTo(pTarget);
@@ -835,16 +835,22 @@ void Unit::OnDeath(Unit *pKiller)
 
 void Unit::SendDeathAnimation(Unit * pKiller /*= nullptr*/)
 {
+	try{
 #ifdef EBENEZER
-	Packet result(WIZ_DEAD);
-	result << GetID();
-	SendToRegion(&result);
+		Packet result(WIZ_DEAD);
+		result << GetID();
+		SendToRegion(&result);
 #else
-	Packet result(AG_DEAD);
-	int16 tid = (pKiller == nullptr ? -1 : pKiller->GetID());
-	result << GetID() << pKiller->GetID();
-	g_pMain->Send(&result);
+		Packet result(AG_DEAD);
+		int16 tid = (pKiller == nullptr ? -1 : pKiller->GetID());
+		result << GetID() << pKiller->GetID();
+		g_pMain->Send(&result);
 #endif
+	}
+	catch (std::exception & ex)
+	{
+		printf("Exception occurred: %s\n", ex.what());
+	}
 }
 
 void Unit::AddType4Buff(uint8 bBuffType, _BUFF_TYPE4_INFO & pBuffInfo)
@@ -857,15 +863,15 @@ void Unit::AddType4Buff(uint8 bBuffType, _BUFF_TYPE4_INFO & pBuffInfo)
 }
 
 /**************************************************************************
- * The following methods should not be here, but it's necessary to avoid
- * code duplication between AI and Ebenezer until they're better merged.
- **************************************************************************/ 
+* The following methods should not be here, but it's necessary to avoid
+* code duplication between AI and Ebenezer until they're better merged.
+**************************************************************************/ 
 
 /**
- * @brief	Sets zone attributes for the loaded zone.
- *
- * @param	zoneNumber	The zone number.
- */
+* @brief	Sets zone attributes for the loaded zone.
+*
+* @param	zoneNumber	The zone number.
+*/
 void KOMap::SetZoneAttributes(int zoneNumber)
 {
 	m_zoneFlags = 0;
@@ -957,13 +963,13 @@ void KOMap::SetZoneAttributes(int zoneNumber)
 }
 
 /**
- * @brief	Determines if an NPC is hostile to a unit.
- * 			Non-hostile units cannot be attacked.
- *
- * @param	pTarget	Target unit
- *
- * @return	true if hostile to, false if not.
- */
+* @brief	Determines if an NPC is hostile to a unit.
+* 			Non-hostile units cannot be attacked.
+*
+* @param	pTarget	Target unit
+*
+* @return	true if hostile to, false if not.
+*/
 bool CNpc::isHostileTo(Unit * pTarget)
 {
 	if (pTarget == nullptr)
@@ -982,8 +988,8 @@ bool CNpc::isHostileTo(Unit * pTarget)
 	// A nation of 0 indicates friendliness to all
 	if (GetNation() == Nation::ALL
 		// Also allow for cases when all NPCs in this zone are inherently friendly.
-		|| (!isMonster() && GetMap()->areNPCsFriendly()))
-		return false;
+			|| (!isMonster() && GetMap()->areNPCsFriendly()))
+			return false;
 
 	// A nation of 3 indicates hostility to all (or friendliness to none)
 	if (GetNation() == Nation::NONE)
@@ -994,13 +1000,13 @@ bool CNpc::isHostileTo(Unit * pTarget)
 }
 
 /**
- * @brief	Determines if a player is hostile to a unit.
- * 			Non-hostile units cannot be attacked.
- *
- * @param	pTarget	Target unit
- *
- * @return	true if hostile to, false if not.
- */
+* @brief	Determines if a player is hostile to a unit.
+* 			Non-hostile units cannot be attacked.
+*
+* @param	pTarget	Target unit
+*
+* @return	true if hostile to, false if not.
+*/
 bool CUser::isHostileTo(Unit * pTarget)
 {
 	if (pTarget == nullptr)
@@ -1025,15 +1031,15 @@ bool CUser::isHostileTo(Unit * pTarget)
 }
 
 /**
- * @brief	Determine if this user is in an arena area.
- *
- * @return	true if in arena, false if not.
- */
+* @brief	Determine if this user is in an arena area.
+*
+* @return	true if in arena, false if not.
+*/
 bool CUser::isInArena()
 {
 	/*
-		All of this needs to be handled more generically 
-		(i.e. bounds loaded from the database, or their existing SMD method).
+	All of this needs to be handled more generically 
+	(i.e. bounds loaded from the database, or their existing SMD method).
 	*/
 
 	// If we're in the Arena zone, assume combat is acceptable everywhere.
@@ -1046,17 +1052,17 @@ bool CUser::isInArena()
 		return false;
 
 	// Moradon outside arena spawn bounds.
-	 return ((GetX() < 735.0f && GetX() > 684.0f) 
-			&& ((GetZ() < 491.0f && GetZ() > 440.0f) || (GetZ() < 411.0f && GetZ() > 360.0f)));
+	return ((GetX() < 735.0f && GetX() > 684.0f) 
+		&& ((GetZ() < 491.0f && GetZ() > 440.0f) || (GetZ() < 411.0f && GetZ() > 360.0f)));
 }
 
 /**
- * @brief	Determine if this user is in a normal PVP zone.
- * 			That is, they're in an PK zone that allows combat 
- * 			against the opposite nation.
- *
- * @return	true if in PVP zone, false if not.
- */
+* @brief	Determine if this user is in a normal PVP zone.
+* 			That is, they're in an PK zone that allows combat 
+* 			against the opposite nation.
+*
+* @return	true if in PVP zone, false if not.
+*/
 bool CUser::isInPVPZone()
 {
 	if (GetMap()->canAttackOtherNation())
