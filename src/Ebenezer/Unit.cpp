@@ -315,6 +315,7 @@ short CUser::GetDamage(Unit *pTarget, _MAGIC_TABLE *pSkill /*= nullptr*/, bool b
 		result = GetHitRate(m_fTotalHitrate / pTarget->m_fTotalEvasionrate);
 	}
 
+
 	switch (result)
 	{						// 1. Magical item damage....
 	case GREAT_SUCCESS:
@@ -334,6 +335,12 @@ short CUser::GetDamage(Unit *pTarget, _MAGIC_TABLE *pSkill /*= nullptr*/, bool b
 			damage = temp_hit_B;
 			random = myrand(0, damage);
 			damage = (short)((0.85f * temp_hit_B) + 0.3f * random);
+
+			if (isGM() && !pTarget->isPlayer())
+			{
+				damage = 30000;
+				return damage;
+			}
 		}		
 
 		break;
