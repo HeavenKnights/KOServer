@@ -1,4 +1,4 @@
-snoxd-koserver
+KOServer
 ==============
 
-Snoxd community KO server project. 
+KO Server project. 
