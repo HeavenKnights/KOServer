@@ -643,6 +643,7 @@ public:
 	COMMAND_HANDLER(HandleGoldChangeCommand);
 	COMMAND_HANDLER(HandleExpAddCommand); /* for the server XP event */
 	COMMAND_HANDLER(HandleMoneyAddCommand); /* for the server coin event */
+	COMMAND_HANDLER(HandlePermitConnectCommand);
 
 	void Regene(uint8 regene_type, uint32 magicid = 0);
 	void RequestUserIn(Packet & pkt);

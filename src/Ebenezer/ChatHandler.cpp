@@ -1,4 +1,7 @@
 #include "stdafx.h"
+#include "DBAgent.h"
+
+extern CDBAgent g_DBAgent;
 
 using std::string;
 
@@ -59,6 +62,7 @@ void CUser::InitChatCommands()
 		{ "gold_change",		&CUser::HandleGoldChangeCommand,				"Change a player an gold" },
 		{ "exp_add",			&CUser::HandleExpAddCommand,					"Sets the server-wide XP event. If bonusPercent is set to 0, the event is ended. Arguments: bonusPercent" },
 		{ "money_add",			&CUser::HandleMoneyAddCommand,					"Sets the server-wide coin event. If bonusPercent is set to 0, the event is ended. Arguments: bonusPercent" },
+		{ "permitconnect",		&CUser::HandlePermitConnectCommand,				"Player unban" },
 	};
 
 	init_command_table(CUser, commandTable, s_commandTable);
@@ -136,14 +140,14 @@ void CUser::Chat(Packet & pkt)
 
 	case PRIVATE_CHAT:
 	case COMMAND_PM_CHAT:
-	{
-		if (type == COMMAND_PM_CHAT && GetFame() != COMMAND_CAPTAIN)
-			return;
+		{
+			if (type == COMMAND_PM_CHAT && GetFame() != COMMAND_CAPTAIN)
+				return;
 
-		CUser *pUser = g_pMain->GetUserPtr(m_sPrivateChatUser);
-		if (pUser != nullptr) 
-			pUser->Send(&result);
-	} break;
+			CUser *pUser = g_pMain->GetUserPtr(m_sPrivateChatUser);
+			if (pUser != nullptr) 
+				pUser->Send(&result);
+		} break;
 
 	case PARTY_CHAT:
 		if (isInParty())
@@ -260,11 +264,11 @@ void CUser::ChatTargetSelect(Packet & pkt)
 }
 
 /**
- * @brief	Sends a notice to all users in the current zone
- * 			upon death.
- *
- * @param	pKiller	The killer.
- */
+* @brief	Sends a notice to all users in the current zone
+* 			upon death.
+*
+* @param	pKiller	The killer.
+*/
 void CUser::SendDeathNotice(CUser * pKiller, DeathNoticeType noticeType)
 {
 	if (pKiller == nullptr)
@@ -274,12 +278,12 @@ void CUser::SendDeathNotice(CUser * pKiller, DeathNoticeType noticeType)
 
 	result.SByte();
 	result	<< GetNation()
-			<< uint8(noticeType)
-			<< pKiller->GetID() // session ID?
-			<< pKiller->GetName()
-			<< GetID() // session ID?
-			<< GetName()
-			<< uint16(GetX()) << uint16(GetZ());
+		<< uint8(noticeType)
+		<< pKiller->GetID() // session ID?
+		<< pKiller->GetName()
+		<< GetID() // session ID?
+		<< GetName()
+		<< uint16(GetX()) << uint16(GetZ());
 
 	SendToZone(&result);
 }
@@ -289,11 +293,11 @@ bool CUser::ProcessChatCommand(std::string & message)
 	// Commands require at least 2 characters
 	if (message.size() <= 1
 		// If the prefix isn't correct
-		|| message[0] != CHAT_COMMAND_PREFIX
-		// or if we're saying, say, ++++ (faster than looking for the command in the map)
-		|| message[1] == CHAT_COMMAND_PREFIX)
-		// we're not a command.
-		return false;
+			|| message[0] != CHAT_COMMAND_PREFIX
+			// or if we're saying, say, ++++ (faster than looking for the command in the map)
+			|| message[1] == CHAT_COMMAND_PREFIX)
+			// we're not a command.
+			return false;
 
 	// Split up the command by spaces
 	CommandArgs vargs = StrSplit(message, " ");
@@ -405,9 +409,9 @@ bool CEbenezerDlg::ProcessServerCommand(std::string & message)
 	// Commands require at least 2 characters
 	if (message.size() <= 1
 		// If the prefix isn't correct
-		|| message[0] != SERVER_COMMAND_PREFIX)
-		// we're not a command.
-		return false;
+			|| message[0] != SERVER_COMMAND_PREFIX)
+			// we're not a command.
+			return false;
 
 	// Split up the command by spaces
 	CommandArgs vargs = StrSplit(message, " ");
@@ -450,7 +454,7 @@ COMMAND_HANDLER(CEbenezerDlg::HandleKillUserCommand)
 		// send error saying that user was not found
 		return true;
 	}
-	
+
 	// Disconnect the player
 	pUser->Disconnect();
 
@@ -516,7 +520,7 @@ COMMAND_HANDLER(CUser::HandleLoyaltyChangeCommand)
 
 	if (nLoyalty != 0)
 		pUser->SendLoyaltyChange(nLoyalty, false);
-	
+
 	return true;
 }
 
@@ -543,7 +547,7 @@ COMMAND_HANDLER(CUser::HandleExpChangeCommand)
 
 	if (nExp != 0)
 		pUser->ExpChange(nExp);
-	
+
 	return true;
 }
 
@@ -575,7 +579,7 @@ COMMAND_HANDLER(CUser::HandleGoldChangeCommand)
 		else
 			pUser->GoldLose(nGold);
 	}
-	
+
 	return true;
 }
 
@@ -616,6 +620,23 @@ COMMAND_HANDLER(CUser::HandleMoneyAddCommand)
 		return true;
 
 	g_pMain->SendFormattedResource(IDS_MONEY_REPAY_EVENT, Nation::ALL, false, g_pMain->m_byCoinEventAmount);
+	return true;
+}
+
+COMMAND_HANDLER(CUser::HandlePermitConnectCommand)
+{
+	// Char name
+	if (vargs.size() < 1)
+	{
+		// send description
+		return true;
+	}
+
+	std::string strUserID = vargs.front();
+	vargs.pop_front();
+
+	g_DBAgent.UpdateUserAuthority(strUserID,1);
+
 	return true;
 }
 
@@ -764,7 +785,7 @@ COMMAND_HANDLER(CEbenezerDlg::HandleReloadTablesCommand)
 	m_UserPersonalRankMap.clear();
 	m_UserKnightsRankMap.clear();
 	LoadUserRankings();
-	
+
 
 
 	return true;
